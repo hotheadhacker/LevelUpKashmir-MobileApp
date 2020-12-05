@@ -15,7 +15,7 @@ export default function Home(){
     const getLatestArticles = async () => {
         try {
           let response = await fetch(
-            'https://levelupkashmir.com/wp-json/wp/v2/posts?_embed'
+            'https://levelupkashmir.com/wp-json/wp/v2/posts?_embed', {cache: "no-store"}
           );
           let json = await response.json();
         //   return json.movies;
