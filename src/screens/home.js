@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
-import { Text, View, StyleSheet, FlatList, Image } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 
-export default function Home(){
+export default function Home({navigation}){
     const [news, setNews] = useState(0);
 
     //expo fonts
@@ -32,6 +32,7 @@ export default function Home(){
       var s = new Date(date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
       return s
     }
+    
     return(
         <View style={styles.container}>
             {/* <Text></Text>
@@ -41,9 +42,8 @@ export default function Home(){
             keyExtractor={item => item.id}
             data={news}
             renderItem={({ item }) => (
-              
+              <TouchableOpacity onPress={() => navigation.navigate('Details', {id: item.id, title: item.title.rendered, date_gmt: item.date_gmt, f_img: item._embedded["wp:featuredmedia"][0].source_url, category: item._embedded["wp:term"][0][0].name})}>
                 <View style={styles.card}>
-                    
                 <Image source = {{uri: item._embedded["wp:featuredmedia"][0].source_url}}
    style = {styles.image}
    />
@@ -56,7 +56,9 @@ export default function Home(){
             </Text>  
             </Text>
             
+            
               </View>
+              </TouchableOpacity>
             )}
           />
         </View>
@@ -114,8 +116,6 @@ const styles = StyleSheet.create({
     tag:{
         backgroundColor: '#a4f64d',
         fontSize: 10,
-        borderWidth: 4,
-        borderRadius: 20,
         fontFamily: 'sans-serif',
         marginLeft: 5
     },

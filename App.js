@@ -4,17 +4,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import Header from './src/components/Header';
 import Home from './src/screens/home';
 import NewsItem from './src/screens/newsItem';
+import Navigator from './src/routes/router'
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      {/* header  */}
-    <Header/>
-
-    {/* home  */}
-    {/* <Home/> */}
-    <NewsItem />
-    </View>
+    <Navigator />
   );
 }
 

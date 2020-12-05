@@ -2,11 +2,13 @@ import React, {useState, useEffect} from 'react';
 import { Text, View, StyleSheet, Image, ScrollView, Share, Button } from 'react-native';
 import { useFonts } from 'expo-font';
 import HTMLView from 'react-native-htmlview';
+// import { FloatingAction } from "react-native-floating-action";
 import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 
-export default function NewsItem(){
+export default function NewsItem({navigation}){
     const [news, setNews] = useState(0);
+    const [body, setBody] = useState('Loading...')
 
     //expo fonts
     let [fontsLoaded] = useFonts({
@@ -14,17 +16,18 @@ export default function NewsItem(){
         'Roboto-Regular': require('../../assets/fonts/Roboto-Regular.ttf'),
 
       });
-    
+    let newUrl = 'https://levelupkashmir.com/wp-json/wp/v2/posts/'+ navigation.getParam('id')
 
     //Get articles first try using async - await
     const getLatestArticles = async () => {
         try {
           let response = await fetch(
-            'https://levelupkashmir.com/wp-json/wp/v2/posts/17', {cache: "no-store"}
+            newUrl, {cache: "no-store"}
           );
           let json = await response.json();
         //   return json.movies;
         setNews(json);
+        setBody(news.content.rendered);
         // console.log(json);
         } catch (error) {
         //   console.error(error);
@@ -59,45 +62,32 @@ export default function NewsItem(){
       return s
     }
     //clearning helper function 
-    function filterTitle(){
-        if(news.title.rendered !== 'undefined'){
-            return news.title.rendered;
-        }
-        else{
-            return 'Fetch() Api Problem';
-        }
-    }
-
-    function filterContent(){
-        if(news.content.rendered !== 'undefined'){
-            return news.content.rendered;
-        }
-        else{
-            return 'Fetch() Api Problem';
-        }
-    }
     return(
        
                 <ScrollView >
-      <Button id={'https:dummyurl.com'} onPress={(e) => onShare(news.link)} title="Share" />
+      <Button  onPress={(e) => onShare(news.link)} title="Share" />
 
  <View style={styles.container}>
-            <View><Text style={styles.title}>{filterTitle()}</Text></View>
+            <View><Text style={styles.title}>{navigation.getParam('title')}</Text></View>
 
             <View>
                 <Image style={styles.image}
-                source = {{uri: news.jetpack_featured_media_url}}
+                source = {{uri: navigation.getParam('f_img')}}
                  />
             </View>
             <View>
             <Text style={styles.lable}>
-                <Entypo name="calendar" size={12} color="black" /> {gmtToIst(news.date_gmt)}
+                <Entypo name="calendar" size={12} color="black" /> {gmtToIst(navigation.getParam('date_gmt'))}
+            </Text> 
+            <Text style={styles.tag}> <AntDesign name="tags" size={12} color="black" /> 
+            {navigation.getParam('category')}
             </Text> 
             </View>
 
             <View style={styles.web}>
+                
             <HTMLView
-                value={filterContent()}					
+                value={body}					
                 stylesheet={htmlstyles}	
                 onLinkPress={(url) => console.log('clicked link: ', url)}
             />
@@ -188,8 +178,6 @@ const styles = StyleSheet.create({
     tag:{
         backgroundColor: '#a4f64d',
         fontSize: 10,
-        borderWidth: 4,
-        borderRadius: 20,
         fontFamily: 'sans-serif',
         marginLeft: 5
     },
