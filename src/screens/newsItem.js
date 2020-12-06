@@ -5,11 +5,29 @@ import HTMLView from 'react-native-htmlview';
 // import { FloatingAction } from "react-native-floating-action";
 import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import HomeLoader from '../components/homeLoader';
+import { FloatingAction } from "react-native-floating-action";
 
 export default function NewsItem({navigation}){
     const [news, setNews] = useState(0);
-    const [body, setBody] = useState('Loading...')
-
+    
+    // floating buttons
+    const actions = [
+      
+      {
+        text: "Share",
+        icon: require("../../assets/share.png"),
+        name: "bt_share",
+        position: 2
+      },
+      {
+        text: "View Web Version",
+        icon: require("../../assets/view-article.png"),
+        name: "bt_web",
+        position: 1
+      },
+      
+    ];
     //expo fonts
     let [fontsLoaded] = useFonts({
         'Nexa-Bold': require('../../assets/fonts/Nexa-Bold.otf'),
@@ -27,7 +45,7 @@ export default function NewsItem({navigation}){
           let json = await response.json();
         //   return json.movies;
         setNews(json);
-        setBody(news.content.rendered);
+        // setBody(news.content.rendered);
         // console.log(json);
         } catch (error) {
         //   console.error(error);
@@ -61,11 +79,29 @@ export default function NewsItem({navigation}){
       var s = new Date(date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
       return s
     }
-    //clearning helper function 
+    //loader with improvements
+    function loader(){
+      if(news == 0){
+        return <HomeLoader />;
+      }
+      else{
+        return(
+          <View style={styles.web}>
+                
+            <HTMLView
+                value={news.content.rendered}					
+                stylesheet={htmlstyles}	
+                onLinkPress={(url) => navigation.navigate('Browser', url)}
+            />
+            </View>
+
+        )
+      }
+    }
     return(
+      <>
        
-                <ScrollView >
-      <Button  onPress={(e) => onShare(news.link)} title="Share" />
+                <ScrollView>
 
  <View style={styles.container}>
             <View><Text style={styles.title}>{navigation.getParam('title')}</Text></View>
@@ -77,26 +113,34 @@ export default function NewsItem({navigation}){
             </View>
             <View>
             <Text style={styles.lable}>
-                <Entypo name="calendar" size={12} color="black" /> {gmtToIst(navigation.getParam('date_gmt'))}
+                <Entypo name="calendar" size={15} color="black" /> {gmtToIst(navigation.getParam('date_gmt'))}
             </Text> 
-            <Text style={styles.tag}> <AntDesign name="tags" size={12} color="black" /> 
+            <Text style={styles.tag}> <AntDesign name="tags" size={15} color="black" /> 
             {navigation.getParam('category')}
             </Text> 
             </View>
 
-            <View style={styles.web}>
-                
-            <HTMLView
-                value={body}					
-                stylesheet={htmlstyles}	
-                onLinkPress={(url) => console.log('clicked link: ', url)}
-            />
-            </View>
+            {loader()}
             
     
         </View>
+        
+      
             
             </ScrollView>
+            <FloatingAction
+    actions={actions}
+    onPressItem={name => {
+      // console.log(`selected button: ${name}`);
+      if(name == 'bt_web'){
+        navigation.navigate('Browser', news.link)
+      }
+      if(name == 'bt_share'){
+        onShare(news.link);
+      }
+    }}
+  />
+            </>
             
     )
 }
@@ -172,14 +216,17 @@ const styles = StyleSheet.create({
     },
     lable:{
         backgroundColor: '#d4dae3',
-        fontSize: 10,
-        fontFamily: 'sans-serif'
+        fontSize: 13,
+        fontFamily: 'sans-serif',
+        textAlign: 'center'
+
     },
     tag:{
         backgroundColor: '#a4f64d',
-        fontSize: 10,
+        fontSize: 13,
         fontFamily: 'sans-serif',
-        marginLeft: 5
+        marginLeft: 5,
+        textAlign: 'center'
     },
     web: {
     

@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, FlatList, Image, TouchableOpacity } from 'react
 import { useFonts } from 'expo-font';
 import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import HomeLoader from '../components/homeLoader';
 
 export default function Home({navigation}){
     const [news, setNews] = useState(0);
@@ -15,7 +16,7 @@ export default function Home({navigation}){
     const getLatestArticles = async () => {
         try {
           let response = await fetch(
-            'https://levelupkashmir.com/wp-json/wp/v2/posts?_embed', {cache: "no-store"}
+            'https://levelupkashmir.com/wp-json/wp/v2/posts?_embed&per_page=100', {cache: "no-store"}
           );
           let json = await response.json();
         //   return json.movies;
@@ -32,12 +33,16 @@ export default function Home({navigation}){
       var s = new Date(date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
       return s
     }
-    
-    return(
-        <View style={styles.container}>
-            {/* <Text></Text>
-            <Text style={styles.fontHeader}>Hello From the other side(Home)</Text>
-    <Text style={styles.fontHeader}>Hello From the other side(Home)</Text> */}
+
+    //Loader Improvements:
+    function loader(){
+      if(news == 0){
+        return <HomeLoader />;
+      }
+      else{
+        return(
+          <View style={styles.container}>
+            
             <FlatList
             keyExtractor={item => item.id}
             data={news}
@@ -62,6 +67,14 @@ export default function Home({navigation}){
             )}
           />
         </View>
+        )
+      }
+    }
+    
+    return(
+        <>
+          {loader()}
+        </>
     )
 }
 const styles = StyleSheet.create({
